@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTOR.WORLD | Pro Store</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        body { background: radial-gradient(circle at top, #1a0633 0%, #050505 100%); color: white; font-family: sans-serif; margin: 0; text-align: center; min-height: 100vh; }
+        header { padding: 30px 10px; }
+        .logo { font-size: 2.2rem; font-weight: 900; background: linear-gradient(to right, #00d2ff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+        .search-container { margin: 10px auto; width: 90%; max-width: 400px; }
+        #searchBox { width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #333; background: rgba(255,255,255,0.05); color: white; outline: none; }
+        .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; max-width: 1200px; margin: 0 auto; }
+        .card { background: rgba(255, 255, 255, 0.05); border-radius: 15px; border: 1px solid #222; overflow: hidden; position: relative; }
+        .card img { width: 100%; height: 300px; object-fit: cover; cursor: zoom-in; }
+        .info { padding: 15px; text-align: left; }
+        .price { color: #ff00ff; font-size: 22px; font-weight: bold; }
+        .order-btn { display: block; background: linear-gradient(45deg, #ff4b2b, #ff416c); color: white; text-align: center; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: bold; margin-top: 10px; }
+        .del-btn { display: none; position: absolute; top: 10px; right: 10px; background: red; color: white; border: none; padding: 8px; border-radius: 5px; cursor: pointer; z-index: 10; font-size: 10px; }
+        #imgModal { display: none; position: fixed; z-index: 999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; }
+        #imgModal img { max-width: 95%; max-height: 85%; border: 2px solid #ff00ff; border-radius: 10px; }
+        #adminArea { display: none; background: #000; padding: 20px; border: 2px solid #ff00ff; margin: 20px auto; border-radius: 15px; max-width: 400px; width: 90%; }
+        .admin-input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #111; color: white; box-sizing: border-box; }
+        .footer { padding: 50px 10px; background: rgba(0,0,0,0.5); position: relative; }
+        .c-btn { display: inline-block; padding: 10px 15px; border-radius: 50px; text-decoration: none; color: white; background: #222; font-size: 12px; margin: 5px; border: 1px solid #333; }
+        #secretBtn { position: absolute; bottom: 0; left: 0; width: 100%; height: 60px; }
+    </style>
+</head>
+<body>
+
+    <header><h1 class="logo">ANTOR.WORLD</h1></header>
+    <div class="search-container"><input type="text" id="searchBox" placeholder="Search..." onkeyup="search()"></div>
+    <div id="imgModal" onclick="this.style.display='none'"><img id="fullImg" src=""></div>
+
+    <div id="adminArea">
+        <input type="text" id="pName" class="admin-input" placeholder="Product Name">
+        <input type="text" id="pPrice" class="admin-input" placeholder="Price">
+        <input type="text" id="pImg" class="admin-input" placeholder="Paste Link or Code Here">
+        <button onclick="uploadProduct()" style="background:#ff00ff; color:white; width:100%; padding:12px; border:none; border-radius:10px; font-weight:bold;">UPLOAD LIVE </button>
+    </div>
+
+    <div class="container" id="productList"></div>
+
+    <div class="footer">
+        <a href="tel:01948082008" class="c-btn">CALL US</a>
+        <a href="https://facebook.com/md.antor.16718979" class="c-btn">FACEBOOK</a>
+        <a href="https://wa.me/8801948082008" class="c-btn">WHATSAPP</a>
+        <div id="secretBtn" onclick="tripleTap()"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+          apiKey: "AIzaSyBKYx0oC4xyrj9BOFPhwYZ5yre3eDwNoyU",
+          authDomain: "antor-world.firebaseapp.com",
+          databaseURL: "https://antor-world-default-rtdb.firebaseio.com",
+          projectId: "antor-world",
+          storageBucket: "antor-world.firebasestorage.app",
+          messagingSenderId: "133571782067",
+          appId: "1:133571782067:web:c9048d37f251457c8597c6"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let isAdmin = false;
+
+        db.ref('products').on('value', (snap) => {
+            const list = document.getElementById('productList');
+            list.innerHTML = "";
+            snap.forEach((child) => {
+                const item = child.val();
+                const key = child.key;
+                //        
+                let cleanImg = item.img;
+                if(item.img.includes('<img')) {
+                    const match = item.img.match(/src="([^"]+)"/);
+                    if(match) cleanImg = match[1];
+                }
+                list.innerHTML += `<div class="card" data-name="${item.name.toLowerCase()}">
+                    <button class="del-btn" style="display:${isAdmin?'block':'none'}" onclick="deleteProduct('${key}')">DEL</button>
+                    <img src="${cleanImg}" onclick="viewImg('${cleanImg}')">
+                    <div class="info"><h3>${item.name}</h3><div class="price"> ${item.price}</div>
+                    <a href="https://wa.me/8801948082008?text=Order:${item.name}" class="order-btn">ORDER NOW</a></div></div>`;
+            });
+        });
+
+        function viewImg(url) { document.getElementById('fullImg').src = url; document.getElementById('imgModal').style.display = 'flex'; }
+        function search() {
+            let val = document.getElementById('searchBox').value.toLowerCase();
+            document.querySelectorAll('.card').forEach(c => c.style.display = c.getAttribute('data-name').includes(val) ? "block" : "none");
+        }
+        let tap = 0;
+        function tripleTap() {
+            tap++;
+            if(tap === 3) {
+                if(prompt("Pass:") === "Antor@99#Shop") {
+                    isAdmin = true;
+                    document.getElementById('adminArea').style.display = 'block';
+                    document.querySelectorAll('.del-btn').forEach(b => b.style.display = 'block');
+                }
+                tap = 0;
+            }
+            setTimeout(() => tap = 0, 2000);
+        }
+        function deleteProduct(key) { if(confirm("Delete?")) db.ref('products').child(key).remove(); }
+        function uploadProduct() {
+            const name = document.getElementById('pName').value, price = document.getElementById('pPrice').value, img = document.getElementById('pImg').value;
+            if(name && price && img) {
+                db.ref('products').push({ name, price, img }).then(() => {
+                    alert("Added!");
+                    document.getElementById('pName').value = ""; document.getElementById('pPrice').value = ""; document.getElementById('pImg').value = "";
+                });
+            }
+        }
+    </script>
+</body>
+</html>
